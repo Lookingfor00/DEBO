@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
+  InvoiceRefRequiredError,
   WalletConflictError,
   getWallet,
   normalizePayerMsisdn,
@@ -12,13 +13,22 @@ function unauthorized() {
   return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await getVisitorSession();
   if (!session.sub) {
     return unauthorized();
   }
-  const wallet = await getWallet(session.sub);
-  return NextResponse.json(wallet);
+  const url = new URL(request.url);
+  const invoiceRef = url.searchParams.get("invoice_ref");
+  try {
+    const wallet = await getWallet(session.sub, invoiceRef);
+    return NextResponse.json(wallet);
+  } catch (error) {
+    if (error instanceof InvoiceRefRequiredError) {
+      return NextResponse.json({ error: "invoice_ref_required" }, { status: 403 });
+    }
+    throw error;
+  }
 }
 
 export async function PUT(request: Request) {

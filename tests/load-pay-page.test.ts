@@ -5,9 +5,20 @@ const listEnabledPaymentMethods = vi.fn();
 const listEnabledPlans = vi.fn();
 const getActiveSubscription = vi.fn();
 
-vi.mock("@/lib/api/wallet", () => ({
-  getWallet: (...args: unknown[]) => getWallet(...args),
-}));
+vi.mock("@/lib/api/wallet", () => {
+  class InvoiceRefRequiredError extends Error {
+    readonly payerMsisdn: string | null;
+    constructor(payerMsisdn: string | null = null) {
+      super("invoice_ref_required");
+      this.name = "InvoiceRefRequiredError";
+      this.payerMsisdn = payerMsisdn;
+    }
+  }
+  return {
+    InvoiceRefRequiredError,
+    getWallet: (...args: unknown[]) => getWallet(...args),
+  };
+});
 
 vi.mock("@/lib/api/payment-methods", () => ({
   listEnabledPaymentMethods: (...args: unknown[]) =>
@@ -70,14 +81,32 @@ describe("loadPayPage", () => {
       ends_at: "2026-11-29T00:00:00Z",
     });
     const { loadPayPage } = await import("@/hooks/pages/load-pay-page");
-    const state = await loadPayPage("auth0|alice");
-    expect(getWallet).toHaveBeenCalledWith("auth0|alice");
+    const state = await loadPayPage("auth0|alice", null, "INV-1");
+    expect(getWallet).toHaveBeenCalledWith("auth0|alice", "INV-1");
     expect(getActiveSubscription).toHaveBeenCalledWith("auth0|alice");
     expect(state.data.payerMsisdn).toBe("22372148718");
     expect(state.data.balanceXof).toBe(1500);
+    expect(state.invoiceRefRequired).toBe(false);
     expect(state.data.activeSubscription).toEqual({
       endsAt: "2026-11-29T00:00:00Z",
     });
+  });
+
+  it("keeps merchants when invoice_ref is required for balance", async () => {
+    const { InvoiceRefRequiredError } = await import("@/lib/api/wallet");
+    getWallet.mockRejectedValue(new InvoiceRefRequiredError("22372148718"));
+    listEnabledPaymentMethods.mockResolvedValue([
+      { display_name: "Orange Money", merchant_msisdn: "22370000000" },
+    ]);
+    const { loadPayPage } = await import("@/hooks/pages/load-pay-page");
+    const state = await loadPayPage("auth0|alice");
+    expect(state.isError).toBe(false);
+    expect(state.invoiceRefRequired).toBe(true);
+    expect(state.data.payerMsisdn).toBe("22372148718");
+    expect(state.data.balanceXof).toBeNull();
+    expect(state.data.merchants).toEqual([
+      { displayName: "Orange Money", msisdn: "22370000000" },
+    ]);
   });
 
   it("returns isError when methods fail", async () => {

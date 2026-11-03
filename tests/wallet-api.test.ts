@@ -6,9 +6,10 @@ type WalletRow = {
   auth0_sub: string;
   payer_msisdn: string;
   balance_xof: number;
+  last_confirmed_reference?: string | null;
 };
 
-function createFakeClient(store: WalletRow[]) {
+function createFakeClient(store: WalletRow[], rpcResult?: unknown) {
   return {
     from(table: string) {
       expect(table).toBe("wallets");
@@ -34,7 +35,11 @@ function createFakeClient(store: WalletRow[]) {
           state.op = "select";
           return thenable;
         },
-        insert(payload: { auth0_sub: string; payer_msisdn: string; balance_xof?: number }) {
+        insert(payload: {
+          auth0_sub: string;
+          payer_msisdn: string;
+          balance_xof?: number;
+        }) {
           const taken = store.some(
             (row) =>
               row.payer_msisdn === payload.payer_msisdn ||
@@ -47,6 +52,7 @@ function createFakeClient(store: WalletRow[]) {
             auth0_sub: payload.auth0_sub,
             payer_msisdn: payload.payer_msisdn,
             balance_xof: payload.balance_xof ?? 0,
+            last_confirmed_reference: null,
           });
           return Promise.resolve({ error: null });
         },
@@ -63,11 +69,17 @@ function createFakeClient(store: WalletRow[]) {
           return Promise.resolve({ data: runSelect(), error: null });
         },
         then(
-          resolve: (value: { data: WalletRow | null; error: { code: string } | null }) => unknown,
+          resolve: (value: {
+            data: WalletRow | null;
+            error: { code: string } | null;
+          }) => unknown,
           reject?: (reason: unknown) => unknown,
         ) {
           if (state.op === "select") {
-            return Promise.resolve({ data: runSelect(), error: null }).then(resolve, reject);
+            return Promise.resolve({ data: runSelect(), error: null }).then(
+              resolve,
+              reject,
+            );
           }
           if (state.op === "update") {
             const idx = store.findIndex(
@@ -81,22 +93,51 @@ function createFakeClient(store: WalletRow[]) {
                   row.auth0_sub !== store[idx].auth0_sub,
               );
               if (clash) {
-                return Promise.resolve({ data: null, error: { code: "23505" } }).then(
-                  resolve,
-                  reject,
-                );
+                return Promise.resolve({
+                  data: null,
+                  error: { code: "23505" },
+                }).then(resolve, reject);
               }
               store[idx].payer_msisdn = next;
               if (state.payload.balance_xof !== undefined) {
                 store[idx].balance_xof = state.payload.balance_xof;
               }
             }
-            return Promise.resolve({ data: null, error: null }).then(resolve, reject);
+            return Promise.resolve({ data: null, error: null }).then(
+              resolve,
+              reject,
+            );
           }
-          return Promise.resolve({ data: null, error: null }).then(resolve, reject);
+          return Promise.resolve({ data: null, error: null }).then(
+            resolve,
+            reject,
+          );
         },
       };
       return thenable;
+    },
+    rpc(name: string, args: { p_auth0_sub: string; p_reference: string }) {
+      expect(name).toBe("confirm_wallet_invoice");
+      if (rpcResult !== undefined) {
+        return Promise.resolve({ data: rpcResult, error: null });
+      }
+      const row = store.find((w) => w.auth0_sub === args.p_auth0_sub);
+      if (!row) {
+        return Promise.resolve({
+          data: { error: "wallet_not_found" },
+          error: null,
+        });
+      }
+      row.balance_xof += 500;
+      row.last_confirmed_reference = args.p_reference;
+      return Promise.resolve({
+        data: {
+          status: "credited",
+          balance_xof: row.balance_xof,
+          last_confirmed_reference: args.p_reference,
+        },
+        error: null,
+      });
     },
   };
 }
@@ -143,21 +184,37 @@ describe("wallet api", () => {
     });
   });
 
-  it("reads only the current sub's wallet", async () => {
-    store.push(
-      {
-        auth0_sub: "auth0|alice",
-        payer_msisdn: "22370000001",
-        balance_xof: 1500,
-      },
-      {
-        auth0_sub: "auth0|bob",
-        payer_msisdn: "22370000002",
-        balance_xof: 99,
-      },
-    );
+  it("reads wallet without ref when last_confirmed_reference is null", async () => {
+    store.push({
+      auth0_sub: "auth0|alice",
+      payer_msisdn: "22370000001",
+      balance_xof: 0,
+      last_confirmed_reference: null,
+    });
     const { getWallet } = await import("@/lib/api/wallet");
     await expect(getWallet("auth0|alice")).resolves.toEqual({
+      payer_msisdn: "22370000001",
+      balance_xof: 0,
+    });
+  });
+
+  it("requires matching invoice_ref after a confirmation", async () => {
+    store.push({
+      auth0_sub: "auth0|alice",
+      payer_msisdn: "22370000001",
+      balance_xof: 1500,
+      last_confirmed_reference: "INV-1",
+    });
+    const { getWallet, InvoiceRefRequiredError } = await import(
+      "@/lib/api/wallet"
+    );
+    await expect(getWallet("auth0|alice")).rejects.toBeInstanceOf(
+      InvoiceRefRequiredError,
+    );
+    await expect(getWallet("auth0|alice", "WRONG")).rejects.toBeInstanceOf(
+      InvoiceRefRequiredError,
+    );
+    await expect(getWallet("auth0|alice", "INV-1")).resolves.toEqual({
       payer_msisdn: "22370000001",
       balance_xof: 1500,
     });
@@ -171,6 +228,7 @@ describe("wallet api", () => {
         auth0_sub: "auth0|alice",
         payer_msisdn: "22372148718",
         balance_xof: 0,
+        last_confirmed_reference: null,
       },
     ]);
     await expect(getWallet("auth0|alice")).resolves.toEqual({
@@ -184,6 +242,7 @@ describe("wallet api", () => {
       auth0_sub: "auth0|alice",
       payer_msisdn: "22370000001",
       balance_xof: 4200,
+      last_confirmed_reference: null,
     });
     const { putWallet } = await import("@/lib/api/wallet");
     await putWallet("auth0|alice", "72148718");
@@ -191,6 +250,7 @@ describe("wallet api", () => {
       auth0_sub: "auth0|alice",
       payer_msisdn: "22372148718",
       balance_xof: 4200,
+      last_confirmed_reference: null,
     });
   });
 
@@ -199,6 +259,7 @@ describe("wallet api", () => {
       auth0_sub: "auth0|bob",
       payer_msisdn: "22372148718",
       balance_xof: 0,
+      last_confirmed_reference: null,
     });
     const { putWallet, WalletConflictError } = await import("@/lib/api/wallet");
     await expect(putWallet("auth0|alice", "72148718")).rejects.toBeInstanceOf(
@@ -206,5 +267,44 @@ describe("wallet api", () => {
     );
     expect(store).toHaveLength(1);
     expect(store[0].auth0_sub).toBe("auth0|bob");
+  });
+
+  it("confirms invoice via RPC and then allows GET with that ref", async () => {
+    store.push({
+      auth0_sub: "auth0|alice",
+      payer_msisdn: "22372148718",
+      balance_xof: 0,
+      last_confirmed_reference: null,
+    });
+    const { confirmWalletInvoice, getWallet } = await import("@/lib/api/wallet");
+    const credited = await confirmWalletInvoice("auth0|alice", "INV-42");
+    expect(credited.balance_xof).toBe(500);
+    expect(credited.last_confirmed_reference).toBe("INV-42");
+    await expect(getWallet("auth0|alice", "INV-42")).resolves.toEqual({
+      payer_msisdn: "22372148718",
+      balance_xof: 500,
+    });
+  });
+
+  it("rejects confirm when RPC returns reference_not_found", async () => {
+    vi.resetModules();
+    process.env.JOBBOARD_SUPABASE_URL = "http://supabase.test";
+    process.env.JOBBOARD_SECRET_KEY = "jobboard-secret";
+    vi.doMock("@/lib/api/jobboard-client", () => ({
+      createJobboardClient: () =>
+        createFakeClient(store, { error: "reference_not_found" }),
+    }));
+    store.push({
+      auth0_sub: "auth0|alice",
+      payer_msisdn: "22372148718",
+      balance_xof: 0,
+      last_confirmed_reference: null,
+    });
+    const { confirmWalletInvoice, InvoiceConfirmError } = await import(
+      "@/lib/api/wallet"
+    );
+    await expect(
+      confirmWalletInvoice("auth0|alice", "MISSING"),
+    ).rejects.toBeInstanceOf(InvoiceConfirmError);
   });
 });

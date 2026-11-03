@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | `todo` |
+| **Status** | `done` |
 | **Depends on** | PI-006, PI-001 |
 | **S refs** | S0, S4, S5, S10 |
 | **Suggested PR title** | `feat(jobboard): wallet credit requires SMS invoice reference` |
@@ -40,9 +40,9 @@ Freeze [`context.md`](./context.md) rows 10–12. Ingest already parses a `refer
 
 ## Definition of Done
 
-- [ ] Change implemented as above
-- [ ] Acceptance checks pass
-- [ ] `00-INDEX.md` status updated for this ticket
+- [x] Change implemented as above
+- [x] Acceptance checks pass
+- [x] `00-INDEX.md` status updated for this ticket
 
 ## Out of scope
 

@@ -15,6 +15,12 @@ vi.mock("@/lib/api/wallet", () => {
       this.name = "WalletConflictError";
     }
   }
+  class InvoiceRefRequiredError extends Error {
+    constructor() {
+      super("invoice_ref_required");
+      this.name = "InvoiceRefRequiredError";
+    }
+  }
   function normalizePayerMsisdn(raw: string): string {
     const digits = raw.replace(/\D/g, "");
     if (digits.startsWith("223")) {
@@ -27,6 +33,7 @@ vi.mock("@/lib/api/wallet", () => {
   }
   return {
     WalletConflictError,
+    InvoiceRefRequiredError,
     normalizePayerMsisdn,
     getWallet: (...args: unknown[]) => getWallet(...args),
     putWallet: (...args: unknown[]) => putWallet(...args),
@@ -47,7 +54,7 @@ describe("GET/PUT/POST /api/wallet", () => {
       sub: null,
     });
     const { GET, PUT } = await import("@/app/api/wallet/route");
-    const getResponse = await GET();
+    const getResponse = await GET(new Request("http://jobboard.test/api/wallet"));
     const putResponse = await PUT(
       new Request("http://jobboard.test/api/wallet", {
         method: "PUT",
@@ -195,7 +202,7 @@ describe("GET/PUT/POST /api/wallet", () => {
     );
   });
 
-  it("returns the session wallet on GET", async () => {
+  it("returns the session wallet on GET when invoice_ref matches", async () => {
     getVisitorSession.mockResolvedValue({
       isAuthenticated: true,
       displayName: "ada",
@@ -206,12 +213,30 @@ describe("GET/PUT/POST /api/wallet", () => {
       balance_xof: 1500,
     });
     const { GET } = await import("@/app/api/wallet/route");
-    const response = await GET();
+    const response = await GET(
+      new Request("http://jobboard.test/api/wallet?invoice_ref=INV-1"),
+    );
     expect(response.status).toBe(200);
-    expect(getWallet).toHaveBeenCalledWith("auth0|alice");
+    expect(getWallet).toHaveBeenCalledWith("auth0|alice", "INV-1");
     await expect(response.json()).resolves.toEqual({
       payer_msisdn: "22372148718",
       balance_xof: 1500,
+    });
+  });
+
+  it("returns 403 when invoice_ref is required", async () => {
+    getVisitorSession.mockResolvedValue({
+      isAuthenticated: true,
+      displayName: "ada",
+      sub: "auth0|alice",
+    });
+    const { InvoiceRefRequiredError } = await import("@/lib/api/wallet");
+    getWallet.mockRejectedValue(new InvoiceRefRequiredError());
+    const { GET } = await import("@/app/api/wallet/route");
+    const response = await GET(new Request("http://jobboard.test/api/wallet"));
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      error: "invoice_ref_required",
     });
   });
 });
