@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | `todo` |
+| **Status** | `done` |
 | **Depends on** | TB-017 |
 | **S refs** | S0, S4, S5 |
 | **Suggested PR title** | `feat(jobboard): alerts activate request-code invalidate APIs` |
@@ -40,9 +40,9 @@ Freeze [`context.md`](./context.md). Code generation is **never** in the browser
 
 ## Definition of Done
 
-- [ ] Change implemented as above
-- [ ] Acceptance checks pass
-- [ ] `00-INDEX.md` status updated for this ticket
+- [x] Change implemented as above
+- [x] Acceptance checks pass
+- [x] `00-INDEX.md` status updated for this ticket
 
 ## Out of scope
 

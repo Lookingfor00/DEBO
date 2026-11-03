@@ -28,6 +28,8 @@ Server-only env (never `NEXT_PUBLIC_*` except the public Auth0 client id if you 
 | `APP_BASE_URL` | `http://localhost:3000` |
 | `AUTH0_DOMAIN` / `AUTH0_CLIENT_ID` / `AUTH0_CLIENT_SECRET` / `AUTH0_SECRET` | new Regular Web Application (not the CRA client) |
 | `JOBBOARD_SUPABASE_URL` / `JOBBOARD_SECRET_KEY` | dedicated `jobboard` schema key — not scrape `service_role` |
+| `ALERTS_SESSION_SECRET` | HMAC for alerts httpOnly session cookie (`POST /api/alerts/activate`) |
+| `ALERTS_INVALIDATE_SECRET` | Bearer for `POST /api/alerts/invalidate` (APK Settings / PI-013; not `service_role`) |
 
 Never set `SUPABASE_SERVICE_ROLE_KEY` or `SCRAPER_RUN_KEY` here. Never put the SMS ingest password (or any ingest secret) in `NEXT_PUBLIC_*`.
 
