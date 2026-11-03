@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { issueActivationCodeForPurchaser } from "@/lib/api/activation-codes";
 import {
   InsufficientBalanceError,
   PlanNotFoundError,
@@ -17,6 +18,26 @@ function isFormPost(request: Request): boolean {
     type.includes("application/x-www-form-urlencoded") ||
     type.includes("multipart/form-data")
   );
+}
+
+async function activationPayload(sub: string) {
+  const issued = await issueActivationCodeForPurchaser(sub);
+  if (issued.status === "issued") {
+    return {
+      activation_code: issued.code,
+      activation_code_already_issued: false as const,
+    };
+  }
+  if (issued.status === "already_issued") {
+    return {
+      activation_code: null,
+      activation_code_already_issued: true as const,
+    };
+  }
+  return {
+    activation_code: null,
+    activation_code_already_issued: false as const,
+  };
 }
 
 export async function POST(request: Request) {
@@ -72,7 +93,8 @@ export async function POST(request: Request) {
   }
   try {
     const result = await purchasePlan(session.sub, planId);
-    return NextResponse.json(result);
+    const activation = await activationPayload(session.sub);
+    return NextResponse.json({ ...result, ...activation });
   } catch (error) {
     if (error instanceof InsufficientBalanceError) {
       return NextResponse.json(

@@ -35,6 +35,12 @@ export type PayViewProps = {
   conflict?: boolean;
   purchased?: boolean;
   purchaseError?: "insufficient" | "missing" | null;
+  invoiceRef?: string | null;
+  invoiceRefRequired?: boolean;
+  credited?: boolean;
+  invoiceError?: string | null;
+  activationCode?: string | null;
+  activationCodeAlreadyIssued?: boolean;
 };
 
 function formatEndsAt(iso: string): string {
@@ -62,6 +68,12 @@ export function PayView({
   conflict = false,
   purchased = false,
   purchaseError = null,
+  invoiceRef = null,
+  invoiceRefRequired = false,
+  credited = false,
+  invoiceError = null,
+  activationCode = null,
+  activationCodeAlreadyIssued = false,
 }: PayViewProps) {
   const balance = balanceXof ?? 0;
 
@@ -110,9 +122,58 @@ export function PayView({
       ) : null}
 
       {purchased ? (
-        <p className="mt-6 text-sm text-muted-foreground">
-          Achat enregistré. Votre abonnement premium est actif.
-        </p>
+        <section
+          className="mt-6 max-w-xl rounded-md border border-border p-4"
+          aria-labelledby="pay-activation-code-heading"
+        >
+          <h2
+            id="pay-activation-code-heading"
+            className="font-heading text-base font-medium"
+          >
+            Achat enregistré
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Votre abonnement premium est actif.
+          </p>
+          {activationCode ? (
+            <>
+              <p className="mt-4 text-sm font-medium text-foreground">
+                Conservez ce code d’activation maintenant — il ne sera plus
+                affiché.
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Notez-le ou copiez-le. Il servira à activer les alertes sur votre
+                téléphone.
+              </p>
+              <Field className="mt-4">
+                <FieldLabel htmlFor="activation_code_display">
+                  Code d’activation
+                </FieldLabel>
+                <Input
+                  id="activation_code_display"
+                  readOnly
+                  value={activationCode}
+                  aria-label="Code d’activation à conserver"
+                />
+              </Field>
+            </>
+          ) : null}
+          {activationCodeAlreadyIssued ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Un code d’activation a déjà été émis pour ce compte. Pour des
+              raisons de sécurité, il ne peut pas être réaffiché. Utilisez le
+              code que vous avez sauvegardé, ou contactez le support si vous
+              l’avez perdu.
+            </p>
+          ) : null}
+          {!activationCode && !activationCodeAlreadyIssued ? (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Le code d’activation n’a pas pu être généré pour le moment.
+              Réessayez depuis cette page après actualisation, ou contactez le
+              support.
+            </p>
+          ) : null}
+        </section>
       ) : null}
 
       {purchaseError === "insufficient" ? (
@@ -123,6 +184,36 @@ export function PayView({
 
       {purchaseError === "missing" ? (
         <p className="mt-6 text-destructive">Plan introuvable.</p>
+      ) : null}
+
+      {credited ? (
+        <p className="mt-6 text-sm text-muted-foreground">
+          Paiement confirmé. Votre solde a été mis à jour.
+        </p>
+      ) : null}
+
+      {invoiceError === "reference_not_found" ? (
+        <p className="mt-6 text-destructive">
+          Référence introuvable ou déjà créditée. Vérifiez le SMS.
+        </p>
+      ) : null}
+
+      {invoiceError === "reference_required" ? (
+        <p className="mt-6 text-destructive">
+          Saisissez la référence figurant sur le SMS.
+        </p>
+      ) : null}
+
+      {invoiceError === "wallet_not_found" ? (
+        <p className="mt-6 text-destructive">
+          Enregistrez d’abord votre numéro payeur.
+        </p>
+      ) : null}
+
+      {invoiceRefRequired && !invoiceError ? (
+        <p className="mt-6 text-sm text-muted-foreground">
+          Indiquez la dernière référence SMS confirmée pour afficher le solde.
+        </p>
       ) : null}
 
       {!isAuthenticated ? (
@@ -190,7 +281,8 @@ export function PayView({
             </p>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               Envoyez n’importe quel montant vers l’un des numéros marchands
-              ci-dessous. Dès que le SMS est reçu, votre solde augmente.
+              ci-dessous. Le crédit n’apparaît qu’après confirmation de la
+              référence SMS à l’étape suivante.
             </p>
             <ul className="mt-6 grid gap-4">
               {merchants.map((merchant) => (
@@ -219,13 +311,47 @@ export function PayView({
             </ul>
           </section>
 
+          <section className="mt-12" aria-labelledby="pay-invoice-heading">
+            <h2
+              id="pay-invoice-heading"
+              className="font-heading flex items-center gap-2 text-xl font-medium"
+            >
+              <BadgeCheck className="size-5 shrink-0" aria-hidden />
+              Étape 3 — Confirmer la référence SMS
+            </h2>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+              Saisissez le numéro de facture / référence du SMS marchand pour
+              créditer votre solde (et pour le consulter ensuite).
+            </p>
+            <form
+              method="post"
+              action="/api/wallet/confirm-invoice"
+              className="mt-6"
+            >
+              <FieldGroup className="max-w-md gap-4">
+                <Field>
+                  <FieldLabel htmlFor="invoice_ref">Référence SMS</FieldLabel>
+                  <Input
+                    id="invoice_ref"
+                    name="reference"
+                    defaultValue={invoiceRef ?? ""}
+                    autoComplete="off"
+                  />
+                </Field>
+                <button type="submit" className={buttonVariants()}>
+                  Confirmer le crédit
+                </button>
+              </FieldGroup>
+            </form>
+          </section>
+
           <section className="mt-12" aria-labelledby="pay-step3-heading">
             <h2
               id="pay-step3-heading"
               className="font-heading flex items-center gap-2 text-xl font-medium"
             >
               <BadgeCheck className="size-5 shrink-0" aria-hidden />
-              Étape 3 — Choisir un plan premium
+              Étape 4 — Choisir un plan premium
             </h2>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">
               Lorsque votre solde atteint la somme nécessaire au premium, vous

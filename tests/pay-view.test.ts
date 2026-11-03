@@ -45,16 +45,38 @@ describe("PayView", () => {
     );
     expect(html).toContain("Étape 1");
     expect(html).toContain("Étape 2 — Payer avec le numéro 22372148718");
-    expect(html).toContain("Étape 3");
+    expect(html).toContain("Étape 3 — Confirmer la référence SMS");
+    expect(html).toContain("Étape 4");
     expect(html).toContain("Plan de test");
     expect(html).toContain("1500");
     expect(html).toContain("22370000000");
     expect(html).toContain('action="/api/wallet"');
+    expect(html).toContain('action="/api/wallet/confirm-invoice"');
+    expect(html).toContain('name="reference"');
     expect(html).toContain('action="/api/plans/purchase"');
     expect(html).toContain(`value="${payPlanFixture.id}"`);
     expect(html).toContain("Acheter");
     expect(html).not.toContain("auth0_sub");
     expect(html).not.toContain('name="balance_xof"');
+  });
+
+  it("shows invoice gate copy when balance requires a reference", () => {
+    const html = renderToStaticMarkup(
+      createElement(PayView, {
+        isAuthenticated: true,
+        payerMsisdn: "22372148718",
+        balanceXof: null,
+        merchants: payPageFixture.merchants,
+        plans: payPageFixture.plans,
+        activeSubscription: null,
+        supportMsisdn: null,
+        isError: false,
+        error: null,
+        invoiceRefRequired: true,
+      }),
+    );
+    expect(html).toContain("dernière référence SMS");
+    expect(html).toContain('action="/api/wallet/confirm-invoice"');
   });
 
   it("asks to credit more when balance is below plan price", () => {
@@ -143,4 +165,48 @@ describe("PayView", () => {
     );
     expect(html).toContain("déjà utilisé");
   });
+
+  it("shows one-shot activation code after purchase", () => {
+    const html = renderToStaticMarkup(
+      createElement(PayView, {
+        isAuthenticated: true,
+        payerMsisdn: "22372148718",
+        balanceXof: 500,
+        merchants: [],
+        plans: [],
+        activeSubscription: { endsAt: "2026-11-29T00:00:00.000Z" },
+        supportMsisdn: null,
+        isError: false,
+        error: null,
+        purchased: true,
+        activationCode: "SAVECODE123",
+      }),
+    );
+    expect(html).toContain("Conservez ce code");
+    expect(html).toContain("SAVECODE123");
+    expect(html).toContain('id="activation_code_display"');
+    expect(html).not.toContain("ne peut pas être réaffiché");
+  });
+
+  it("shows safe already-issued message without inventing a code", () => {
+    const html = renderToStaticMarkup(
+      createElement(PayView, {
+        isAuthenticated: true,
+        payerMsisdn: "22372148718",
+        balanceXof: 500,
+        merchants: [],
+        plans: [],
+        activeSubscription: { endsAt: "2026-11-29T00:00:00.000Z" },
+        supportMsisdn: null,
+        isError: false,
+        error: null,
+        purchased: true,
+        activationCodeAlreadyIssued: true,
+      }),
+    );
+    expect(html).toContain("déjà été émis");
+    expect(html).toContain("ne peut pas être réaffiché");
+    expect(html).not.toContain('id="activation_code_display"');
+  });
 });
+

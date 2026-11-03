@@ -3,9 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const getVisitorSession = vi.fn();
 const listEnabledPlans = vi.fn();
 const purchasePlan = vi.fn();
+const issueActivationCodeForPurchaser = vi.fn();
 
 vi.mock("@/lib/auth0", () => ({
   getVisitorSession: (...args: unknown[]) => getVisitorSession(...args),
+}));
+
+vi.mock("@/lib/api/activation-codes", () => ({
+  issueActivationCodeForPurchaser: (...args: unknown[]) =>
+    issueActivationCodeForPurchaser(...args),
 }));
 
 vi.mock("@/lib/api/plans", () => {
@@ -36,6 +42,11 @@ describe("GET /api/plans and POST /api/plans/purchase", () => {
     getVisitorSession.mockReset();
     listEnabledPlans.mockReset();
     purchasePlan.mockReset();
+    issueActivationCodeForPurchaser.mockReset();
+    issueActivationCodeForPurchaser.mockResolvedValue({
+      status: "issued",
+      code: "SAVE-ME-NOW",
+    });
   });
 
   it("lists enabled plans without auth", async () => {
@@ -115,7 +126,49 @@ describe("GET /api/plans and POST /api/plans/purchase", () => {
       "auth0|alice",
       "11111111-1111-1111-1111-111111111111",
     );
-    await expect(response.json()).resolves.toMatchObject({ balance_xof: 500 });
+    expect(issueActivationCodeForPurchaser).toHaveBeenCalledWith("auth0|alice");
+    await expect(response.json()).resolves.toMatchObject({
+      balance_xof: 500,
+      activation_code: "SAVE-ME-NOW",
+      activation_code_already_issued: false,
+    });
+  });
+
+  it("JSON purchase returns already_issued without a second plaintext code", async () => {
+    getVisitorSession.mockResolvedValue({
+      isAuthenticated: true,
+      displayName: "Alice",
+      sub: "auth0|alice",
+    });
+    purchasePlan.mockResolvedValue({
+      balance_xof: 500,
+      subscription: {
+        id: "sub-1",
+        auth0_sub: "auth0|alice",
+        plan_id: "11111111-1111-1111-1111-111111111111",
+        starts_at: "2026-10-30T00:00:00Z",
+        ends_at: "2026-11-29T00:00:00Z",
+      },
+    });
+    issueActivationCodeForPurchaser.mockResolvedValue({
+      status: "already_issued",
+    });
+    const { POST } = await import("@/app/api/plans/purchase/route");
+    const response = await POST(
+      new Request("http://jobboard.test/api/plans/purchase", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          plan_id: "11111111-1111-1111-1111-111111111111",
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      balance_xof: 500,
+      activation_code: null,
+      activation_code_already_issued: true,
+    });
   });
 
   it("returns 400 insufficient_balance", async () => {

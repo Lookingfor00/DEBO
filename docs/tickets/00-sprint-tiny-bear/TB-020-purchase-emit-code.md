@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | `todo` |
+| **Status** | `done` |
 | **Depends on** | TB-019, PI-009, PI-010 |
 | **S refs** | S5, S8 |
 | **Suggested PR title** | `feat(jobboard): show one-shot activation code after purchase` |
@@ -37,9 +37,9 @@ Freeze [`context.md`](./context.md) rows 7, 12. Auth0 remains for `/pay` / walle
 
 ## Definition of Done
 
-- [ ] Change implemented as above
-- [ ] Acceptance checks pass
-- [ ] `00-INDEX.md` status updated for this ticket
+- [x] Change implemented as above
+- [x] Acceptance checks pass
+- [x] `00-INDEX.md` status updated for this ticket
 
 ## Out of scope
 
