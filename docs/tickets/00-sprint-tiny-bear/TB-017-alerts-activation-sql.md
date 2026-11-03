@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | `todo` |
+| **Status** | `done` |
 | **Depends on** | TB-016, PI-001 |
 | **S refs** | S0, S4, S5, S10, S11 |
 | **Suggested PR title** | `feat(jobboard): activation codes and alert filters SQL` |
