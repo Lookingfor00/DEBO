@@ -1,143 +1,70 @@
-<a name="readme-top"></a>
+# Job board (DEBO `update-next`)
 
-# 📗 Table of Contents
+Public Solinet job board: Next.js App Router at the repo root. This branch is **not** the MERN tenders/Mongo stack on `main`.
 
-- [📗 Table of Contents](#-table-of-contents)
-- [📖 Rencontre Afrique ](#-rencontre-afrique-)
-  - [🛠 Built With ](#-built-with-)
-    - [Tech Stack ](#tech-stack-)
-    - [Key Features ](#key-features-)
-  - [Preview](#preview)
-  - [🚀 Live Demo ](#-live-demo-)
-  - [📺 Presentation Video ](#-presentation-video-)
-  - [💻 Getting Started ](#-getting-started-)
-    - [Setup](#setup)
-    - [Install](#install)
-    - [Usage](#usage)
-  - [👥 Authors ](#-authors-)
-  - [🔭 Future Features ](#-future-features-)
-  - [🤝 Contributing ](#-contributing-)
-  - [⭐️ Show your support ](#️-show-your-support-)
-  - [🙏 Acknowledgments ](#-acknowledgments-)
-  - [📝 License ](#-license-)
+Catalogue: upserted `public.items` where `project = jobs`, via AI-scrapper `GET /api/public/jobs` (Bearer `JOBS_READ_KEY`). Visitors log in with Auth0. Favorites and `/pay` (payer number + `balance_xof`) live in schema `jobboard` on the shared instance `ai-scrapper` (S0–S12).
 
-# 📖 DEBO Info <a name="about-project"></a>
+## Docs
 
-This project is a web platform that notifies users about new tenders. It includes features like:
-- **Tender notifications:** Users receive updates about new tenders on the dashboard.
-- **Search and filtering:** Users can search for tenders and filter them by country and activity type.
-- **Tender management:** Users can save their preferred tenders or hide others.
-- **User authentication:** Integrated via Auth0 for secure logins.
+- Tickets: [`docs/tickets/00-sprint-tiny-bear/00-INDEX.md`](docs/tickets/00-sprint-tiny-bear/00-INDEX.md)
+- SMS Pay (`/pay` + Android ingest): [`../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/00-INDEX.md`](../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/00-INDEX.md)
+- Shared Supabase + Auth0: [`../SOLINET-SHARED-SUPABASE.md`](../SOLINET-SHARED-SUPABASE.md)
+- Product SQL (applied on `ai-scrapper`): [`docs/sql/001_jobboard_favorites.sql`](docs/sql/001_jobboard_favorites.sql), [`002_jobboard_payments.sql`](docs/sql/002_jobboard_payments.sql), [`003_orange_money_regex.sql`](docs/sql/003_orange_money_regex.sql), [`004_jobboard_postgrest_schema.sql`](docs/sql/004_jobboard_postgrest_schema.sql), [`005_jobboard_service_role_grants.sql`](docs/sql/005_jobboard_service_role_grants.sql), [`006_jobboard_plans.sql`](docs/sql/006_jobboard_plans.sql)
 
-
-## 🛠 Built With <a name="built-with"></a>
-
-### Tech Stack <a name="tech-stack"></a>
-
-- **Frontend:** React.js
-- **Backend:** Express.js
-- **Database:** MongoDb
-- **Deployed on:** Vercel and Netifly
-
-### Key Features <a name="key-features"></a>
-
-- **Dynamic Search and Filtering:** Utilizes MongoDB to manage and search large datasets of tenders.
-- **Tender Management:** Users can interact with tender data, saving or hiding entries as needed.
-- **Secure Payments and Notifications:** Includes a payment page that triggers administrative notifications via email using Formspree.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Decisions Made
-- **Choosing the MERN Stack:** Opted for MERN to apply my freshly acquired skills rather than using Rails or a React + Serverless architecture, which might have simplified the development process.
-- **Deployment Choices:** Chose to deploy the backend and frontend separately on Vercel and Netlify to maximize learning opportunities from each platform.
-- **Security Considerations:** Deliberately did not implement measures against CSRF and brute force attacks initially, focusing on learning core functionalities to enhance security later.
-- **Testing Strategy:** Decided against using Jest for testing to leave room for learning a new testing framework in future enhancements.
-This comprehensive approach not only challenged my coding skills but also allowed me to explore practical aspects of building a robust web application.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-## 🔭 Future Features <a name="future-features"></a>
-
-- [ ] **TypeScript Migration:** To enhance code reliability and maintenance.
-- [ ] **Use WebSocket:** for real-time notifications ?
-- [ ] **Implement security mesure**
-- [ ] **Testing Framework Integration:** Plan to introduce a new testing framework to expand my testing capabilities.
-- [ ] **Authentication Updates:** Explore and integrate a more advanced authentication method.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Preview
-
-<details>
-  <summary>Preview</summary>
-  
-</details>
-
-## 🚀 Live Demo <a name="live-demo"></a>
-
-[Live Demo Link available soon]()
-
-## 📺 Presentation Video <a name="live-demo"></a>
-[Presentation video available soon!]()
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-## 💻 Getting Started <a name="getting-started"></a>
-
-To get a local copy up and running, follow these steps.
-
-### Setup
-
-Clone this repository to your desired folder:
+## Run
 
 ```sh
-  cd my-folder
-  git clone git@github.com:Trast00/DEBO.git
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-### Install
+Server-only env (never `NEXT_PUBLIC_*` except the public Auth0 client id if you add one later):
 
-Install this project with:
+| Var | Role |
+|-----|------|
+| `JOBS_API_URL` | AI-scrapper origin + `/api/public/jobs` |
+| `JOBS_READ_KEY` | public catalogue Bearer |
+| `APP_BASE_URL` | `http://localhost:3000` |
+| `AUTH0_DOMAIN` / `AUTH0_CLIENT_ID` / `AUTH0_CLIENT_SECRET` / `AUTH0_SECRET` | new Regular Web Application (not the CRA client) |
+| `JOBBOARD_SUPABASE_URL` / `JOBBOARD_SECRET_KEY` | dedicated `jobboard` schema key — not scrape `service_role` |
 
-```sh
-  cd my-project
-  npm install
+Never set `SUPABASE_SERVICE_ROLE_KEY` or `SCRAPER_RUN_KEY` here. Never put the SMS ingest password (or any ingest secret) in `NEXT_PUBLIC_*`.
+
+## Auth0 dashboard (human)
+
+This app is Next.js App Router. Login is **`@auth0/nextjs-auth0`** (server cookie + `/auth/login` `/auth/callback` `/auth/logout`). Do **not** install `@auth0/auth0-react` or wrap with `Auth0Provider` — that SPA flow cannot feed `sub` into `/api/favorites`.
+
+If the Auth0 Application was created as **SPA** (Token Endpoint Auth Method `none`):
+
+1. Auth0 → Applications → this app (`8yED7cVOViHfYOQHUFmlCIR2e9NA4bMM`).
+2. **Application Type** → **Regular Web Application**.
+3. **Token Endpoint Authentication Method** → **POST**.
+4. Copy **Client Secret** into `AUTH0_CLIENT_SECRET` in `.env.local` (and Vercel).
+
+Then paste these URLs (no trailing slash, no `:443`):
+
+**Allowed Callback URLs**
+
+```
+http://localhost:3000/auth/callback
+https://jobs.solinet.dev/auth/callback
 ```
 
-### Usage
+**Allowed Logout URLs**
 
-To run the project, execute the following command:
-
-```sh
-  npm run build
-  npm start
+```
+http://localhost:3000
+https://jobs.solinet.dev
 ```
 
+**Allowed Web Origins**
 
-## 🤝 Contributing <a name="contributing"></a>
+```
+http://localhost:3000
+https://jobs.solinet.dev
+```
 
-Contributions, issues, and feature requests are welcome!
+**Application Login URI** (optional): `https://jobs.solinet.dev`
 
-Feel free to check the [issues page]().
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-## ⭐️ Show your support <a name="support"></a>
-
-Give a ⭐️ if you like this project! It's help
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-## 👥 Authors <a name="authors"></a>
-
-👤 **Dicko Allasane**
-
-- GitHub: [@trast00](https://github.com/Trast00)
-- Twitter: [@dickoallassane](https://twitter.com/AllassaneDicko0/)
-- LinkedIn: [@dickoallassane](https://www.linkedin.com/in/allassane-dicko-744aaa224)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+Local: `APP_BASE_URL=http://localhost:3000`. Production: `APP_BASE_URL=https://jobs.solinet.dev`. Generate `AUTH0_SECRET` with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Restart `npm run dev` after saving `.env.local`. Click **Connexion**.
