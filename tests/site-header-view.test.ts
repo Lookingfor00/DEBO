@@ -16,8 +16,11 @@ describe("SiteHeaderView", () => {
     expect(html).toContain("Accueil");
     expect(html).toContain('href="/jobs"');
     expect(html).toContain("Offres");
+    expect(html).toContain('href="/alerts"');
+    expect(html).toContain("Alertes");
     expect(html).toContain('href="/pay"');
     expect(html).toContain("Payer");
+
     expect(html).toContain("/logowhite.png");
     expect(html).toContain("/auth/login");
     expect(html).toContain("Connexion");

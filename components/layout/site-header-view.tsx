@@ -23,6 +23,9 @@ function NavLinks() {
       <a href="/jobs" className="text-sm font-medium text-primary-foreground">
         Offres
       </a>
+      <a href="/alerts" className="text-sm font-medium text-primary-foreground">
+        Alertes
+      </a>
       <a href="/pay" className="text-sm font-medium text-primary-foreground">
         Payer
       </a>

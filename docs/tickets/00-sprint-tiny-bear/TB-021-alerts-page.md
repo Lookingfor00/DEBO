@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Status** | `todo` |
+| **Status** | `done` |
 | **Depends on** | TB-019, TB-003 |
 | **S refs** | S1, S6, S12 |
 | **Suggested PR title** | `feat(jobboard): alerts page with phone activation and keywords` |
@@ -40,9 +40,9 @@ Freeze [`context.md`](./context.md). Matching = **keywords only**. Catalogue via
 
 ## Definition of Done
 
-- [ ] Change implemented as above
-- [ ] Acceptance checks pass
-- [ ] `00-INDEX.md` status updated for this ticket
+- [x] Change implemented as above
+- [x] Acceptance checks pass
+- [x] `00-INDEX.md` status updated for this ticket
 
 ## Out of scope
 

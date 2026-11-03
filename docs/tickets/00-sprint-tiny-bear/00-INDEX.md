@@ -44,14 +44,14 @@ Cross-repo PI tickets live under `solinet-pay-sms-scrapper/docs/tickets/00-sprin
 | TB-014 | Landing icons | `done` | TB-013 | DEBO | [TB-014-landing-icons.md](./TB-014-landing-icons.md) |
 | TB-015 | Landing motion | `done` | TB-013 | DEBO | [TB-015-landing-motion.md](./TB-015-landing-motion.md) |
 | TB-016 | Landing scroll reveal | `done` | TB-015 | DEBO | [TB-016-landing-scroll-reveal.md](./TB-016-landing-scroll-reveal.md) |
-| TB-017 | Alerts activation SQL | `todo` | TB-016 | DEBO (SQL) | [TB-017-alerts-activation-sql.md](./TB-017-alerts-activation-sql.md) |
-| TB-018 | Wallet invoice / SMS reference gate | `todo` | PI-006 | DEBO | [TB-018-wallet-invoice-gate.md](./TB-018-wallet-invoice-gate.md) |
-| TB-019 | Alerts activate / request-code / invalidate APIs | `todo` | TB-017 | DEBO | [TB-019-alerts-activation-api.md](./TB-019-alerts-activation-api.md) |
-| TB-020 | Purchase shows one-shot activation code | `todo` | TB-019, PI-009 | DEBO | [TB-020-purchase-emit-code.md](./TB-020-purchase-emit-code.md) |
-| TB-021 | `/alerts` page | `todo` | TB-019, TB-003 | DEBO | [TB-021-alerts-page.md](./TB-021-alerts-page.md) |
-| PI-011 | APK silence unparsed SMS notify | `todo` | PI-005 | pay-sms | [PI-011](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-011-silence-unparsed-notify.md) |
-| PI-012 | APK parse on/off toggle | `todo` | PI-005 | pay-sms | [PI-012](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-012-parse-toggle.md) |
-| PI-013 | APK invalidate activation code | `todo` | TB-019, PI-011 | pay-sms | [PI-013](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-013-invalidate-activation-code.md) |
+| TB-017 | Alerts activation SQL | `done` | TB-016 | DEBO (SQL) | [TB-017-alerts-activation-sql.md](./TB-017-alerts-activation-sql.md) |
+| TB-018 | Wallet invoice / SMS reference gate | `done` | PI-006 | DEBO | [TB-018-wallet-invoice-gate.md](./TB-018-wallet-invoice-gate.md) |
+| TB-019 | Alerts activate / request-code / invalidate APIs | `done` | TB-017 | DEBO | [TB-019-alerts-activation-api.md](./TB-019-alerts-activation-api.md) |
+| TB-020 | Purchase shows one-shot activation code | `done` | TB-019, PI-009 | DEBO | [TB-020-purchase-emit-code.md](./TB-020-purchase-emit-code.md) |
+| TB-021 | `/alerts` page | `done` | TB-019, TB-003 | DEBO | [TB-021-alerts-page.md](./TB-021-alerts-page.md) |
+| PI-011 | APK silence unparsed SMS notify | `done` | PI-005 | pay-sms | [PI-011](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-011-silence-unparsed-notify.md) |
+| PI-012 | APK parse on/off toggle | `done` | PI-005 | pay-sms | [PI-012](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-012-parse-toggle.md) |
+| PI-013 | APK invalidate activation code | `done` | TB-019, PI-011 | pay-sms | [PI-013](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-013-invalidate-activation-code.md) |
 
 ---
 
