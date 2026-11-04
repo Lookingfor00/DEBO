@@ -1,5 +1,6 @@
 import { MenuIcon } from "lucide-react";
 
+import { TrackedAnchor } from "@/components/analytics/tracked-link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
@@ -17,18 +18,42 @@ export type SiteHeaderViewProps = {
 function NavLinks() {
   return (
     <>
-      <a href="/" className="text-sm font-medium text-primary-foreground">
+      <TrackedAnchor
+        href="/"
+        ctaId="nav_home"
+        location="header"
+        eventName="nav_click"
+        className="text-sm font-medium text-primary-foreground"
+      >
         Accueil
-      </a>
-      <a href="/jobs" className="text-sm font-medium text-primary-foreground">
+      </TrackedAnchor>
+      <TrackedAnchor
+        href="/jobs"
+        ctaId="nav_jobs"
+        location="header"
+        eventName="nav_click"
+        className="text-sm font-medium text-primary-foreground"
+      >
         Offres
-      </a>
-      <a href="/alerts" className="text-sm font-medium text-primary-foreground">
+      </TrackedAnchor>
+      <TrackedAnchor
+        href="/alerts"
+        ctaId="nav_alerts"
+        location="header"
+        eventName="nav_click"
+        className="text-sm font-medium text-primary-foreground"
+      >
         Alertes
-      </a>
-      <a href="/pay" className="text-sm font-medium text-primary-foreground">
+      </TrackedAnchor>
+      <TrackedAnchor
+        href="/pay"
+        ctaId="nav_pay"
+        location="header"
+        eventName="nav_click"
+        className="text-sm font-medium text-primary-foreground"
+      >
         Payer
-      </a>
+      </TrackedAnchor>
     </>
   );
 }
@@ -67,10 +92,16 @@ export function SiteHeaderView({
   return (
     <header className="bg-primary text-primary-foreground">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-2">
-        <a href="/" className="flex items-center gap-2">
+        <TrackedAnchor
+          href="/"
+          ctaId="nav_logo"
+          location="header"
+          eventName="nav_click"
+          className="flex items-center gap-2"
+        >
           <img src="/logowhite.png" alt="" className="size-10" />
           <span className="font-heading text-xl font-medium">Debo</span>
-        </a>
+        </TrackedAnchor>
         <nav className="hidden items-center gap-6 md:flex">
           <NavLinks />
           <AuthControl

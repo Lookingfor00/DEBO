@@ -17,6 +17,7 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { TrackedAnchor } from "@/components/analytics/tracked-link";
 import {
   type LandingIconKey,
   landingGuaranteeBodyAfter,
@@ -167,8 +168,10 @@ export function LandingView({
             Money ou Moov.
           </p>
           <div className="flex flex-wrap gap-3">
-            <a
+            <TrackedAnchor
               href="/jobs"
+              ctaId="landing_hero_jobs"
+              location="landing_hero"
               className={cn(
                 buttonVariants({ variant: "secondary", size: "lg" }),
                 ctaHoverMotion,
@@ -179,9 +182,11 @@ export function LandingView({
                 className="size-4 text-current"
               />
               Voir les offres
-            </a>
-            <a
+            </TrackedAnchor>
+            <TrackedAnchor
               href="/pay"
+              ctaId="landing_hero_pay"
+              location="landing_hero"
               className={cn(
                 buttonVariants({
                   variant: "outline",
@@ -194,7 +199,7 @@ export function LandingView({
             >
               <LandingIcon name="wallet" className="size-4 text-current" />
               S’abonner
-            </a>
+            </TrackedAnchor>
           </div>
         </LandingReveal>
       </section>
@@ -224,8 +229,10 @@ export function LandingView({
                 </CardHeader>
                 {item.step === 1 ? (
                   <CardContent className="flex flex-wrap gap-2">
-                    <a
+                    <TrackedAnchor
                       href="/jobs"
+                      ctaId="landing_step1_jobs"
+                      location="landing_steps"
                       className={cn(
                         buttonVariants({
                           variant: "secondary",
@@ -235,9 +242,12 @@ export function LandingView({
                       )}
                     >
                       Voir les offres
-                    </a>
-                    <a
+                    </TrackedAnchor>
+                    <TrackedAnchor
                       href={whatsappChannelUrl}
+                      ctaId="landing_step1_whatsapp"
+                      location="landing_steps"
+                      outbound
                       target="_blank"
                       rel="noopener noreferrer"
                       className={cn(
@@ -248,20 +258,22 @@ export function LandingView({
                     >
                       <WhatsAppIcon className="text-white" />
                       Rejoindre les channels WhatsApp
-                    </a>
+                    </TrackedAnchor>
                   </CardContent>
                 ) : null}
                 {item.step === 2 ? (
                   <CardContent>
-                    <a
+                    <TrackedAnchor
                       href="/pay"
+                      ctaId="landing_step2_pay"
+                      location="landing_steps"
                       className={cn(
                         buttonVariants({ size: "sm" }),
                         ctaHoverMotion,
                       )}
                     >
                       Rejoindre le premium
-                    </a>
+                    </TrackedAnchor>
                   </CardContent>
                 ) : null}
               </Card>
@@ -373,12 +385,14 @@ export function LandingView({
           </h2>
           <p className="mt-4 max-w-3xl text-muted-foreground">
             {landingGuaranteeBodyBefore}{" "}
-            <a
+            <TrackedAnchor
               href="/remboursement"
+              ctaId="landing_guarantee_refund"
+              location="landing_guarantee"
               className="font-medium text-primary underline underline-offset-4"
             >
               formulaire
-            </a>{" "}
+            </TrackedAnchor>{" "}
             {landingGuaranteeBodyAfter}
           </p>
         </LandingReveal>
@@ -423,8 +437,10 @@ export function LandingView({
               {landingPlanClosing}
             </p>
             <div className="mt-8">
-              <a
+              <TrackedAnchor
                 href="/pay"
+                ctaId="landing_plan_pay"
+                location="landing_plan"
                 className={cn(buttonVariants({ size: "lg" }), ctaHoverMotion)}
               >
                 <LandingIcon
@@ -432,7 +448,7 @@ export function LandingView({
                   className="size-4 text-current"
                 />
                 Voir les plans et payer
-              </a>
+              </TrackedAnchor>
             </div>
           </LandingReveal>
         </div>

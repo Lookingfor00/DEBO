@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Heebo, Jost } from "next/font/google";
 
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
+import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
+import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity";
 import { SiteFooterView } from "@/components/layout/site-footer-view";
 import { SiteHeaderView } from "@/components/layout/site-header-view";
 import { getVisitorSession } from "@/lib/auth0";
@@ -29,6 +32,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         className="flex min-h-svh flex-col bg-background text-foreground antialiased"
         suppressHydrationWarning
       >
+        <MicrosoftClarity />
+        <AnalyticsProvider />
+        <CookieConsentBanner />
         <SiteHeaderView
           isAuthenticated={session.isAuthenticated}
           displayName={session.displayName}

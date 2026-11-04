@@ -1,5 +1,7 @@
 import Markdown from "react-markdown";
 
+import { JobViewTracker } from "@/components/analytics/job-view-tracker";
+import { TrackedAnchor } from "@/components/analytics/tracked-link";
 import { FavoriteToggleView } from "@/components/jobs/favorite-toggle-view";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -25,10 +27,16 @@ export function JobDetailView({
 }: JobDetailViewProps) {
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
+      <JobViewTracker itemId={job.id} />
       <p>
-        <a href="/jobs" className={buttonVariants({ variant: "link" })}>
+        <TrackedAnchor
+          href="/jobs"
+          ctaId="job_detail_back"
+          location="job_detail"
+          className={buttonVariants({ variant: "link" })}
+        >
           Retour à la liste
-        </a>
+        </TrackedAnchor>
       </p>
       <Card className="mt-4">
         <CardHeader>
@@ -56,9 +64,17 @@ export function JobDetailView({
         <CardContent className="pt-6">
           {job.sourceUrl ? (
             <p className="mb-6 text-sm">
-              <a href={job.sourceUrl} className="underline underline-offset-4">
+              <TrackedAnchor
+                href={job.sourceUrl}
+                ctaId="job_source"
+                location="job_detail"
+                outbound
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4"
+              >
                 Offre d’origine
-              </a>
+              </TrackedAnchor>
             </p>
           ) : null}
           {job.descriptionMd ? (
