@@ -1,3 +1,4 @@
+import { PushSubscribeView } from "@/components/alerts/push-subscribe-view";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -141,6 +142,8 @@ export function AlertsView({
           </button>
         </FieldGroup>
       </form>
+
+      <PushSubscribeView hasKeywords={Boolean(keywords.trim())} />
 
       <section className="mt-12" aria-labelledby="alerts-jobs-heading">
         <h2

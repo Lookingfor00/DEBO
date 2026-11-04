@@ -36,6 +36,10 @@ describe("jobs env", () => {
     expect(example).toMatch(/^SUPPORT_MSISDN=/m);
     expect(example).toMatch(/^ALERTS_SESSION_SECRET=/m);
     expect(example).toMatch(/^ALERTS_INVALIDATE_SECRET=/m);
+    expect(example).toMatch(/^ALERTS_PUSH_DISPATCH_SECRET=/m);
+    expect(example).toMatch(/^NEXT_PUBLIC_VAPID_PUBLIC_KEY=/m);
+    expect(example).toMatch(/^VAPID_PRIVATE_KEY=/m);
+    expect(example).toMatch(/^VAPID_SUBJECT=/m);
     expect(example).not.toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
     expect(example).not.toMatch(/^SCRAPER_RUN_KEY=/m);
     expect(example).not.toMatch(/^NEXT_PUBLIC_AUTH0_SECRET=/m);
@@ -43,6 +47,8 @@ describe("jobs env", () => {
     expect(example).not.toMatch(/^NEXT_PUBLIC_SUPPORT_MSISDN=/m);
     expect(example).not.toMatch(/^NEXT_PUBLIC_ALERTS_SESSION_SECRET=/m);
     expect(example).not.toMatch(/^NEXT_PUBLIC_ALERTS_INVALIDATE_SECRET=/m);
+    expect(example).not.toMatch(/^NEXT_PUBLIC_ALERTS_PUSH_DISPATCH_SECRET=/m);
+    expect(example).not.toMatch(/^NEXT_PUBLIC_VAPID_PRIVATE_KEY=/m);
   });
 });
 

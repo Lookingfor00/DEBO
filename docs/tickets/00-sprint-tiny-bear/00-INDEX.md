@@ -5,7 +5,7 @@ Conventions: [`CONVENTIONS.md`](./CONVENTIONS.md).
 Template: [`_TEMPLATE.md`](./_TEMPLATE.md).  
 Shared Supabase: [`../../../../SOLINET-SHARED-SUPABASE.md`](../../../../SOLINET-SHARED-SUPABASE.md).
 
-**How to run:** one chat/PR = one `TB-*` (or one `PI-*` in wave 6) when practical. TB-002 lands in **AI-scrapper**; other TB-* on DEBO `update-next`. Wave 6 PI-* execute in **solinet-pay-sms-scrapper** but follow this INDEX order.
+**How to run:** one chat/PR = one `TB-*` (or one `PI-*` in wave 6) when practical. TB-002 and TB-022 land in **AI-scrapper**; other TB-* on DEBO `update-next`. Wave 6 PI-* execute in **solinet-pay-sms-scrapper** but follow this INDEX order.
 
 ---
 
@@ -19,6 +19,7 @@ Shared Supabase: [`../../../../SOLINET-SHARED-SUPABASE.md`](../../../../SOLINET-
 | **4** | TB-009, TB-010, TB-011, TB-012 | shadcn + chrome then landing then `/jobs` overview + fiche |
 | **5** | TB-013, TB-014, TB-015, TB-016 | Landing notes, icons, CSS motion, then scroll reveal |
 | **6** | TB-017 → TB-021, then PI-011 → PI-013 | Alerts/codes + wallet invoice gate (DEBO); APK silence/toggle/invalidate (pay-sms). **Execution SoT for this wave.** Freeze: [context.md](./context.md) |
+| **7** | TB-022 → TB-023 | Public jobs `publish_at` sort (AI-scrapper); alerts Web Push MVP (DEBO). Freeze amend: [context.md](./context.md) |
 
 Cross-repo PI tickets live under `solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/` but **run in the wave 6 order above**.
 
@@ -49,6 +50,8 @@ Cross-repo PI tickets live under `solinet-pay-sms-scrapper/docs/tickets/00-sprin
 | TB-019 | Alerts activate / request-code / invalidate APIs | `done` | TB-017 | DEBO | [TB-019-alerts-activation-api.md](./TB-019-alerts-activation-api.md) |
 | TB-020 | Purchase shows one-shot activation code | `done` | TB-019, PI-009 | DEBO | [TB-020-purchase-emit-code.md](./TB-020-purchase-emit-code.md) |
 | TB-021 | `/alerts` page | `done` | TB-019, TB-003 | DEBO | [TB-021-alerts-page.md](./TB-021-alerts-page.md) |
+| TB-022 | Sort public jobs by `publish_at` desc | `done` | TB-002 | AI-scrapper | [TB-022-jobs-sort-publish-at.md](./TB-022-jobs-sort-publish-at.md) |
+| TB-023 | Alerts Web Push MVP | `done` | TB-021 | DEBO | [TB-023-alerts-web-push.md](./TB-023-alerts-web-push.md) |
 | PI-011 | APK silence unparsed SMS notify | `done` | PI-005 | pay-sms | [PI-011](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-011-silence-unparsed-notify.md) |
 | PI-012 | APK parse on/off toggle | `done` | PI-005 | pay-sms | [PI-012](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-012-parse-toggle.md) |
 | PI-013 | APK invalidate activation code | `done` | TB-019, PI-011 | pay-sms | [PI-013](../../../../solinet-pay-sms-scrapper/docs/tickets/00-sprint-sms-pay/PI-013-invalidate-activation-code.md) |
@@ -71,3 +74,5 @@ Cross-repo PI tickets live under `solinet-pay-sms-scrapper/docs/tickets/00-sprin
 | S4 / S10 | Alerts codes + filters SQL | TB-017 |
 | S5 | Wallet invoice gate ; alerts session cookie | TB-018, TB-019 |
 | S1 / S6 | `/alerts` matched jobs | TB-021 |
+| S1 / S6 | Public list order `publish_at` | TB-022 |
+| S0 / S4 / S10 / S11 | Alerts Web Push subscriptions | TB-023 |
