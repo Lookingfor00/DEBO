@@ -55,3 +55,7 @@ Wave 6 freeze had Web Push “hors V1”. Wave 7 amends: **browser Web Push in s
 ## Out of scope
 
 WhatsApp delivery, FCM / native apps, admin blast UI, Auth0-gated push, changing keyword match semantics, marketing campaigns.
+
+## Auto-trigger (post-ship)
+
+After a **jobs** scrape with `upserted > 0`, the AI-scrapper worker POSTs this dispatch route (env `DEBO_PUSH_DISPATCH_URL` + `DEBO_PUSH_DISPATCH_SECRET` on the VPS). No Vercel cron.
