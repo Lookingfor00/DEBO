@@ -35,6 +35,12 @@ export type LandingTeamMember = {
   icon: LandingIconKey;
 };
 
+export const landingHeroLeadWhatsapp =
+  "Explorez le catalogue, abonnez-vous au premium pour des alertes WhatsApp personnalisées, et postulez en un clic. Paiement Orange Money ou Moov.";
+
+export const landingHeroLeadAlerts =
+  "Explorez le catalogue, abonnez-vous au premium pour des alertes navigateur personnalisées, et postulez en un clic. Paiement Orange Money ou Moov.";
+
 export const landingStepsFixture: LandingStep[] = [
   {
     step: 1,
@@ -53,6 +59,29 @@ export const landingStepsFixture: LandingStep[] = [
     step: 3,
     title: "Recevez des offres customisées à VOTRE profil.",
     body: "Seulement les postes qui correspondent à vos critères, en DM WhatsApp.",
+    icon: "userCheck",
+  },
+];
+
+/** LB-010: landing steps when WhatsApp copy is gated off (Web Push /alerts). */
+export const landingStepsAlertsFixture: LandingStep[] = [
+  {
+    step: 1,
+    title: "Explorer nos offres gratuitement",
+    body: "Laissez-vous convaincre en une minute.",
+    icon: "search",
+  },
+  {
+    step: 2,
+    title:
+      "Pour le prix d’un tacos, devenez un membre premium et investissez dans votre carrière.",
+    body: "Offres personnalisées via alertes navigateur sur /alerts.",
+    icon: "crown",
+  },
+  {
+    step: 3,
+    title: "Recevez des offres customisées à VOTRE profil.",
+    body: "Seulement les postes qui correspondent à vos critères, en notification navigateur.",
     icon: "userCheck",
   },
 ];
@@ -81,6 +110,16 @@ export const landingProblemItemsFixture: LandingBullet[] = [
   },
 ];
 
+export const landingProblemItemsAlertsFixture: LandingBullet[] = [
+  {
+    title: "J’ai pas le bon diplôme ou de compétences ?",
+    body: "Peut-être. Ou peut-être que tu postules aux mauvaises offres pendant que les bonnes passent sous le nez de quelqu’un d’autre. Le marché ne manque pas de postes — il manque de filtres. Nous, on filtre.",
+    icon: "graduationCap",
+  },
+  landingProblemItemsFixture[1]!,
+  landingProblemItemsFixture[2]!,
+];
+
 export const landingSolutionTitle = "On a la solution. (Oui, vraiment.)";
 
 export const landingSolutionLead =
@@ -104,10 +143,27 @@ export const landingSolutionItemsFixture: LandingBullet[] = [
   },
 ];
 
+export const landingSolutionItemsAlertsFixture: LandingBullet[] = [
+  landingSolutionItemsFixture[0]!,
+  {
+    title: "Recevez des alertes pour ne plus avoir à chercher",
+    body: "Vous n’aurez plus besoin de discipline, juste d’ouvrir les notifications navigateur pour faire avancer votre carrière.",
+    icon: "messageCircle",
+  },
+  {
+    title: "Nous, on connaît les bons tontons",
+    body: "Le réseau, c’est notre métier. Le catalogue public pour te convaincre en une minute. Le premium pour les alertes customisées. Toi, tu n’as pas besoin de connaître tout Bamako / Abidjan / Dakar — tu as besoin d’être dans la bonne boîte de réception. La nôtre.",
+    icon: "handshake",
+  },
+];
+
 export const landingTeamTitle = "On n’est pas une boîte anonyme derrière un logo.";
 
 export const landingTeamLead =
   "Qui sommes-nous ? On ne vend pas du rêve LinkedIn importé. On vend des offres qui existent, filtrées, livrées sur WhatsApp. Faites-nous confiance pour maximiser ce qu’il vous reste de cette année.";
+
+export const landingTeamLeadAlerts =
+  "Qui sommes-nous ? On ne vend pas du rêve LinkedIn importé. On vend des offres qui existent, filtrées, livrées par alertes navigateur. Faites-nous confiance pour maximiser ce qu’il vous reste de cette année.";
 
 export const landingTeamMembersFixture: LandingTeamMember[] = [
   {
@@ -138,6 +194,9 @@ export const landingPlanTitle =
 
 export const landingPlanLead =
   "Un seul chemin premium. Pas six formules pour te perdre. Orange Money ou Moov, tu crédites, tu actives, les DM commencent.";
+
+export const landingPlanLeadAlerts =
+  "Un seul chemin premium. Pas six formules pour te perdre. Orange Money ou Moov, tu crédites, tu actives, les alertes commencent.";
 
 export const landingPlanClosing =
   "Tu peux continuer à « chercher ». Ou tu peux rejoindre ceux qui reçoivent déjà. On sait lequel des deux aura un emploi cette année.";

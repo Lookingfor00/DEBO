@@ -14,11 +14,15 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const formspreeUrl = "https://formspree.io/f/xzblkrvw";
 const whatsappChannelUrl = "https://chat.whatsapp.com/example-invite";
 
-function renderLanding(plans: PayPlanVm[] = [payPlanFixture]) {
+function renderLanding(
+  plans: PayPlanVm[] = [payPlanFixture],
+  whatsappCopyEnabled = false,
+) {
   return renderToStaticMarkup(
     createElement(LandingView, {
       formspreeUrl,
       whatsappChannelUrl,
+      whatsappCopyEnabled,
       plans,
     }),
   );
@@ -39,8 +43,19 @@ describe("LandingView", () => {
     expect(html).not.toContain("/jobs/abc");
   });
 
-  it("renders join steps and WhatsApp CTA without the mini-guarantee banner", () => {
-    const html = renderLanding();
+  it("hides WhatsApp CTA and uses alerts wording when flag is off", () => {
+    const html = renderLanding([payPlanFixture], false);
+    expect(html).toContain("alertes navigateur");
+    expect(html).toContain('href="/alerts"');
+    expect(html).toContain("Activer les alertes");
+    expect(html).not.toContain("Rejoindre les channels WhatsApp");
+    expect(html).not.toContain(`href="${whatsappChannelUrl}"`);
+    expect(html).not.toContain("bg-[#25D366]");
+    expect(html).not.toContain('data-icon="whatsapp"');
+  });
+
+  it("renders join steps and WhatsApp CTA when flag is on", () => {
+    const html = renderLanding([payPlanFixture], true);
     expect(html).toContain(
       "Comment nous rejoindre et maximiser vos chances d’avoir un emploi",
     );
@@ -105,6 +120,7 @@ describe("LandingView", () => {
     expect(page).toContain("LandingView");
     expect(page).toContain("FORMSPREE");
     expect(page).toContain("WHATSAPP_CHANNEL_URL");
+    expect(page).toContain("getWhatsappCopyEnabled");
   });
 
   it("ships the hero asset under public/", () => {
@@ -112,8 +128,8 @@ describe("LandingView", () => {
     expect(readFileSync(asset).byteLength).toBeGreaterThan(1000);
   });
 
-  it("renders Lucide icons in each marketing section and keeps WhatsApp mark", () => {
-    const html = renderLanding();
+  it("renders Lucide icons in each marketing section and WhatsApp mark when enabled", () => {
+    const html = renderLanding([payPlanFixture], true);
     const sections = [
       "steps",
       "problem",

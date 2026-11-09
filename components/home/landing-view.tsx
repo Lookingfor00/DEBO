@@ -23,17 +23,24 @@ import {
   landingGuaranteeBodyAfter,
   landingGuaranteeBodyBefore,
   landingGuaranteeTitle,
+  landingHeroLeadAlerts,
+  landingHeroLeadWhatsapp,
   landingPlanClosing,
   landingPlanLead,
+  landingPlanLeadAlerts,
   landingPlanTitle,
+  landingProblemItemsAlertsFixture,
   landingProblemItemsFixture,
   landingProblemLead,
   landingProblemTitle,
+  landingSolutionItemsAlertsFixture,
   landingSolutionItemsFixture,
   landingSolutionLead,
   landingSolutionTitle,
+  landingStepsAlertsFixture,
   landingStepsFixture,
   landingTeamLead,
+  landingTeamLeadAlerts,
   landingTeamMembersFixture,
   landingTeamTitle,
 } from "@/components/home/fixtures";
@@ -58,6 +65,8 @@ import { cn } from "@/lib/utils";
 export type LandingViewProps = {
   formspreeUrl: string;
   whatsappChannelUrl: string;
+  /** LB-010: when false, hide WhatsApp CTA/copy and use /alerts wording. */
+  whatsappCopyEnabled?: boolean;
   plans: PayPlanVm[];
 };
 
@@ -111,12 +120,27 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-function StepTitle({ step, title }: { step: number; title: string }) {
-  if (step === 1) {
+function StepTitle({
+  step,
+  title,
+  whatsappCopyEnabled,
+}: {
+  step: number;
+  title: string;
+  whatsappCopyEnabled: boolean;
+}) {
+  if (step === 1 && whatsappCopyEnabled) {
     return (
       <CardTitle>
         Explorer nos offres et rejoindre notre canal WhatsApp{" "}
         <strong className="font-semibold">gratuitement</strong>
+      </CardTitle>
+    );
+  }
+  if (step === 1 && !whatsappCopyEnabled) {
+    return (
+      <CardTitle>
+        Explorer nos offres <strong className="font-semibold">gratuitement</strong>
       </CardTitle>
     );
   }
@@ -144,8 +168,28 @@ const ctaHoverMotion =
 export function LandingView({
   formspreeUrl,
   whatsappChannelUrl,
+  whatsappCopyEnabled = false,
   plans,
 }: LandingViewProps) {
+  const steps = whatsappCopyEnabled
+    ? landingStepsFixture
+    : landingStepsAlertsFixture;
+  const problemItems = whatsappCopyEnabled
+    ? landingProblemItemsFixture
+    : landingProblemItemsAlertsFixture;
+  const solutionItems = whatsappCopyEnabled
+    ? landingSolutionItemsFixture
+    : landingSolutionItemsAlertsFixture;
+  const heroLead = whatsappCopyEnabled
+    ? landingHeroLeadWhatsapp
+    : landingHeroLeadAlerts;
+  const teamLead = whatsappCopyEnabled
+    ? landingTeamLead
+    : landingTeamLeadAlerts;
+  const planLead = whatsappCopyEnabled
+    ? landingPlanLead
+    : landingPlanLeadAlerts;
+
   return (
     <main>
       <section className="relative isolate overflow-hidden text-primary-foreground">
@@ -162,11 +206,7 @@ export function LandingView({
           <h1 className="font-heading text-3xl font-medium md:text-4xl">
             Faites-nous confiance pour votre recherche d’emploi.
           </h1>
-          <p className="max-w-xl text-primary-foreground/90">
-            Explorez le catalogue, abonnez-vous au premium pour des alertes
-            WhatsApp personnalisées, et postulez en un clic. Paiement Orange
-            Money ou Moov.
-          </p>
+          <p className="max-w-xl text-primary-foreground/90">{heroLead}</p>
           <div className="flex flex-wrap gap-3">
             <TrackedAnchor
               href="/jobs"
@@ -183,6 +223,28 @@ export function LandingView({
               />
               Voir les offres
             </TrackedAnchor>
+            {!whatsappCopyEnabled ? (
+              <TrackedAnchor
+                href="/alerts"
+                ctaId="landing_hero_alerts"
+                location="landing_hero"
+                className={cn(
+                  buttonVariants({
+                    variant: "outline",
+                    size: "lg",
+                    className:
+                      "border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground",
+                  }),
+                  ctaHoverMotion,
+                )}
+              >
+                <LandingIcon
+                  name="messageCircle"
+                  className="size-4 text-current"
+                />
+                Activer les alertes
+              </TrackedAnchor>
+            ) : null}
             <TrackedAnchor
               href="/pay"
               ctaId="landing_hero_pay"
@@ -216,7 +278,7 @@ export function LandingView({
           </h2>
         </LandingReveal>
         <LandingStaggerGrid className="mt-8 grid list-none gap-4 p-0 md:grid-cols-3">
-          {landingStepsFixture.map((item) => (
+          {steps.map((item) => (
             <LandingStaggerItem key={item.step}>
               <Card className={cardHoverMotion}>
                 <CardHeader>
@@ -224,7 +286,11 @@ export function LandingView({
                   <p className="text-sm font-medium text-primary">
                     Étape {item.step}
                   </p>
-                  <StepTitle step={item.step} title={item.title} />
+                  <StepTitle
+                    step={item.step}
+                    title={item.title}
+                    whatsappCopyEnabled={whatsappCopyEnabled}
+                  />
                   <CardDescription>{item.body}</CardDescription>
                 </CardHeader>
                 {item.step === 1 ? (
@@ -243,22 +309,36 @@ export function LandingView({
                     >
                       Voir les offres
                     </TrackedAnchor>
-                    <TrackedAnchor
-                      href={whatsappChannelUrl}
-                      ctaId="landing_step1_whatsapp"
-                      location="landing_steps"
-                      outbound
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        buttonVariants({ size: "sm" }),
-                        "bg-[#25D366] text-white hover:bg-[#1ebe57]",
-                        ctaHoverMotion,
-                      )}
-                    >
-                      <WhatsAppIcon className="text-white" />
-                      Rejoindre les channels WhatsApp
-                    </TrackedAnchor>
+                    {!whatsappCopyEnabled ? (
+                      <TrackedAnchor
+                        href="/alerts"
+                        ctaId="landing_step1_alerts"
+                        location="landing_steps"
+                        className={cn(
+                          buttonVariants({ size: "sm" }),
+                          ctaHoverMotion,
+                        )}
+                      >
+                        Activer les alertes
+                      </TrackedAnchor>
+                    ) : (
+                      <TrackedAnchor
+                        href={whatsappChannelUrl}
+                        ctaId="landing_step1_whatsapp"
+                        location="landing_steps"
+                        outbound
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          buttonVariants({ size: "sm" }),
+                          "bg-[#25D366] text-white hover:bg-[#1ebe57]",
+                          ctaHoverMotion,
+                        )}
+                      >
+                        <WhatsAppIcon className="text-white" />
+                        Rejoindre les channels WhatsApp
+                      </TrackedAnchor>
+                    )}
                   </CardContent>
                 ) : null}
                 {item.step === 2 ? (
@@ -293,7 +373,7 @@ export function LandingView({
             </p>
           </LandingReveal>
           <LandingStaggerGrid className="mt-8 grid list-none gap-4 p-0 md:grid-cols-3">
-            {landingProblemItemsFixture.map((item) => (
+            {problemItems.map((item) => (
               <LandingStaggerItem key={item.title}>
                 <Card className={cn("h-full", cardHoverMotion)}>
                   <CardHeader>
@@ -321,7 +401,7 @@ export function LandingView({
           </p>
         </LandingReveal>
         <LandingStaggerGrid className="mt-8 grid list-none gap-4 p-0 md:grid-cols-3">
-          {landingSolutionItemsFixture.map((item) => (
+          {solutionItems.map((item) => (
             <LandingStaggerItem key={item.title}>
               <Card className={cn("h-full", cardHoverMotion)}>
                 <CardHeader>
@@ -342,7 +422,7 @@ export function LandingView({
               {landingTeamTitle}
             </h2>
             <p className="mt-2 max-w-3xl text-muted-foreground">
-              {landingTeamLead}
+              {teamLead}
             </p>
           </LandingReveal>
           <LandingStaggerGrid className="mt-8 grid list-none gap-6 p-0 sm:grid-cols-2">
@@ -405,7 +485,7 @@ export function LandingView({
               {landingPlanTitle}
             </h2>
             <p className="mt-2 max-w-3xl text-muted-foreground">
-              {landingPlanLead}
+              {planLead}
             </p>
           </LandingReveal>
           {plans.length === 0 ? (
