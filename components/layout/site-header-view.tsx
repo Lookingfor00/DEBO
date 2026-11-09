@@ -15,7 +15,7 @@ export type SiteHeaderViewProps = {
   displayName: string | null;
 };
 
-function NavLinks() {
+function NavLinks({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <>
       <TrackedAnchor
@@ -36,6 +36,17 @@ function NavLinks() {
       >
         Offres
       </TrackedAnchor>
+      {isAuthenticated ? (
+        <TrackedAnchor
+          href="/favorites"
+          ctaId="nav_favorites"
+          location="header"
+          eventName="nav_click"
+          className="text-sm font-medium text-primary-foreground"
+        >
+          Favoris
+        </TrackedAnchor>
+      ) : null}
       <TrackedAnchor
         href="/alerts"
         ctaId="nav_alerts"
@@ -103,7 +114,7 @@ export function SiteHeaderView({
           <span className="font-heading text-xl font-medium">Debo</span>
         </TrackedAnchor>
         <nav className="hidden items-center gap-6 md:flex">
-          <NavLinks />
+          <NavLinks isAuthenticated={isAuthenticated} />
           <AuthControl
             isAuthenticated={isAuthenticated}
             displayName={displayName}
@@ -127,7 +138,7 @@ export function SiteHeaderView({
               <SheetTitle className="text-primary-foreground">Menu</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-4 px-4">
-              <NavLinks />
+              <NavLinks isAuthenticated={isAuthenticated} />
               <AuthControl
                 isAuthenticated={isAuthenticated}
                 displayName={displayName}

@@ -20,6 +20,8 @@ describe("SiteHeaderView", () => {
     expect(html).toContain("Alertes");
     expect(html).toContain('href="/pay"');
     expect(html).toContain("Payer");
+    expect(html).not.toContain('href="/favorites"');
+    expect(html).not.toContain("Favoris");
 
     expect(html).toContain("/logowhite.png");
     expect(html).toContain("/auth/login");
@@ -28,7 +30,7 @@ describe("SiteHeaderView", () => {
     expect(html).not.toContain("/auth/logout");
   });
 
-  it("shows display name and logout when authenticated, without sub", () => {
+  it("shows display name, Favoris, and logout when authenticated, without sub", () => {
     const html = renderToStaticMarkup(
       createElement(SiteHeaderView, {
         isAuthenticated: true,
@@ -38,6 +40,8 @@ describe("SiteHeaderView", () => {
     expect(html).toContain("ada@example.com");
     expect(html).toContain("/auth/logout");
     expect(html).toContain("Déconnexion");
+    expect(html).toContain('href="/favorites"');
+    expect(html).toContain("Favoris");
     expect(html).not.toContain("auth0|ada");
     expect(html).not.toContain("/auth/login");
   });
